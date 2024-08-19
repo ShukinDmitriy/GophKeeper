@@ -1,0 +1,13 @@
+@startuml usecase
+
+left to right direction
+actor Пользователь as u
+
+usecase UC1 as "Проходит процедуру регистрации" #palegreen;line:green
+usecase UC2 as "Проходит процедуру аутентификации" #palegreen;line:green
+
+u -left-> UC1
+u -right-> UC2
+(UC1) .up-> (UC2) : include
+
+@enduml
