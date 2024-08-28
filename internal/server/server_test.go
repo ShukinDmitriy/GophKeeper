@@ -1,97 +1,16 @@
 package server_test
 
 import (
-	"context"
 	"encoding/json"
-	"math/rand"
 	"net/http"
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/ShukinDmitriy/GophKeeper/internal/server"
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/auth"
+	"github.com/ShukinDmitriy/GophKeeper/internal/test-helpers"
+
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/config"
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/controllers"
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/repositories"
-	"github.com/labstack/echo/v4"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
-
-// GenerateShortKey generate random string
-func generateRandomString(length int) string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	source := rand.NewSource(time.Now().UnixNano())
-	rng := rand.New(source)
-	shortKey := make([]byte, length)
-	for i := range shortKey {
-		shortKey[i] = charset[rng.Intn(len(charset))]
-	}
-
-	return string(shortKey)
-}
-
-func prepareURL(conf *config.Config, url string) string {
-	return "http://" + conf.RunAddress + url
-}
-
-func createConfig(t *testing.T) *config.Config {
-	conf, err := config.NewConfig()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return conf
-}
-
-func createServer(t *testing.T, conf *config.Config) *echo.Echo {
-	postgresqlURL := conf.DatabaseURI
-
-	if postgresqlURL == "" {
-		t.Fatal("no DATABASE_URI in .env")
-	}
-	db, err := gorm.Open(postgres.Open(postgresqlURL), &gorm.Config{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	userRepository := repositories.NewUserRepository(db)
-	authUser := auth.NewAuthUser(userRepository)
-	authService := auth.NewAuthService(*authUser)
-	userController := controllers.NewUserController(
-		authService,
-		userRepository,
-	)
-
-	httpServer := server.NewHTTPServer(
-		conf,
-		authService,
-		userController,
-	)
-
-	go func() {
-		_ = httpServer.Start(conf.RunAddress)
-	}()
-
-	// Ждем запуска сервера
-	timeout := time.After(10 * time.Second)
-	for {
-		select {
-		case <-timeout:
-			t.Fatal("timed out waiting for server to start")
-		default:
-			resp, err := http.Get(prepareURL(conf, "/"))
-			if err != nil {
-				continue
-			}
-			defer resp.Body.Close()
-
-			return httpServer
-		}
-	}
-}
 
 func userRegister(t *testing.T, conf *config.Config) {
 	type args struct {
@@ -101,7 +20,7 @@ func userRegister(t *testing.T, conf *config.Config) {
 	type want struct {
 		status []int
 	}
-	userLogin := generateRandomString(10)
+	userLogin := test_helpers.GenerateRandomString(10)
 	tests := []struct {
 		name string
 		args args
@@ -121,7 +40,7 @@ func userRegister(t *testing.T, conf *config.Config) {
 			name: "Success registration",
 			args: args{
 				login:    userLogin,
-				password: generateRandomString(10),
+				password: test_helpers.GenerateRandomString(10),
 			},
 			want: want{
 				status: []int{http.StatusOK},
@@ -131,7 +50,7 @@ func userRegister(t *testing.T, conf *config.Config) {
 			name: "User exists",
 			args: args{
 				login:    userLogin,
-				password: generateRandomString(10),
+				password: test_helpers.GenerateRandomString(10),
 			},
 			want: want{
 				status: []int{http.StatusConflict},
@@ -140,8 +59,8 @@ func userRegister(t *testing.T, conf *config.Config) {
 		{
 			name: "Validation error #1",
 			args: args{
-				login:    generateRandomString(3),
-				password: generateRandomString(10),
+				login:    test_helpers.GenerateRandomString(3),
+				password: test_helpers.GenerateRandomString(10),
 			},
 			want: want{
 				status: []int{http.StatusBadRequest},
@@ -150,8 +69,8 @@ func userRegister(t *testing.T, conf *config.Config) {
 		{
 			name: "Validation error #2",
 			args: args{
-				login:    generateRandomString(10),
-				password: generateRandomString(3),
+				login:    test_helpers.GenerateRandomString(10),
+				password: test_helpers.GenerateRandomString(3),
 			},
 			want: want{
 				status: []int{http.StatusBadRequest},
@@ -167,7 +86,7 @@ func userRegister(t *testing.T, conf *config.Config) {
 			}
 			bodyJson, _ := json.Marshal(body)
 			resp, err := http.Post(
-				prepareURL(conf, "/api/user/register"),
+				test_helpers.PrepareURL(conf, "/api/user/register"),
 				"application/json",
 				strings.NewReader(string(bodyJson)),
 			)
@@ -220,8 +139,8 @@ func userLogin(t *testing.T, conf *config.Config) {
 		{
 			name: "User not exists",
 			args: args{
-				login:    generateRandomString(10),
-				password: generateRandomString(10),
+				login:    test_helpers.GenerateRandomString(10),
+				password: test_helpers.GenerateRandomString(10),
 			},
 			want: want{
 				status: []int{http.StatusUnauthorized},
@@ -230,8 +149,8 @@ func userLogin(t *testing.T, conf *config.Config) {
 		{
 			name: "Validation error",
 			args: args{
-				login:    generateRandomString(3),
-				password: generateRandomString(3),
+				login:    test_helpers.GenerateRandomString(3),
+				password: test_helpers.GenerateRandomString(3),
 			},
 			want: want{
 				status: []int{http.StatusBadRequest},
@@ -247,7 +166,7 @@ func userLogin(t *testing.T, conf *config.Config) {
 			}
 			bodyJson, _ := json.Marshal(body)
 			resp, err := http.Post(
-				prepareURL(conf, "/api/user/login"),
+				test_helpers.PrepareURL(conf, "/api/user/login"),
 				"application/json",
 				strings.NewReader(string(bodyJson)),
 			)
@@ -265,19 +184,13 @@ func userLogin(t *testing.T, conf *config.Config) {
 }
 
 func TestServer(t *testing.T) {
-	// Создаем конфигурацию
-	conf := createConfig(t)
-	// Запускаем сервер
-	httpServer := createServer(t, conf)
+	// Запуск сервера
+	_, conf, httpServer := test_helpers.RunServer(t)
 
-	// Отключаем сервер
-	defer func() {
-		ctx := context.TODO()
-
-		_ = httpServer.Shutdown(ctx)
-	}()
-
-	// Запуск тестов
+	// Запуск тестов сервера
 	userRegister(t, conf)
 	userLogin(t, conf)
+
+	// Отключаем сервер
+	test_helpers.StopServer(t, httpServer)
 }

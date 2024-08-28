@@ -1,4 +1,4 @@
-include .env
+include server.env
 
 build-mocks:
 	@go get github.com/vektra/mockery/v2@v2.43.2
@@ -24,3 +24,6 @@ static-check:
 format:
 	@go get mvdan.cc/gofumpt@latest
 	@~/go/bin/gofumpt -l -w .
+
+generate-swagger:
+	~/go/bin/swag init -g ./cmd/server/main.go -o ./cmd/server/docs

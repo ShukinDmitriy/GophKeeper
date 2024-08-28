@@ -1,0 +1,99 @@
+basePath: /api
+definitions:
+  requests.UserLogin:
+    properties:
+      login:
+        maxLength: 32
+        minLength: 4
+        type: string
+      password:
+        maxLength: 32
+        minLength: 4
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  requests.UserRegister:
+    properties:
+      login:
+        maxLength: 32
+        minLength: 4
+        type: string
+      password:
+        maxLength: 32
+        minLength: 4
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  responses.UserInfo:
+    properties:
+      id:
+        type: integer
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Swagger EOL API
+  version: "1.0"
+paths:
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Авторизация пользователя
+      parameters:
+      - description: data
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.UserInfo'
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+      tags:
+      - User
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация пользователя
+      parameters:
+      - description: data
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.UserInfo'
+        "400":
+          description: Bad request
+        "409":
+          description: Conflict
+        "500":
+          description: Internal server error
+      tags:
+      - User
+swagger: "2.0"

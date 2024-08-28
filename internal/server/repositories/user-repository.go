@@ -3,11 +3,12 @@ package repositories
 import (
 	"errors"
 
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
+
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/data"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/responses"
 
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/entities"
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/requests"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

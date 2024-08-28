@@ -1,8 +1,8 @@
 package repositories
 
 import (
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/data"
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/requests"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/responses"
 )
 

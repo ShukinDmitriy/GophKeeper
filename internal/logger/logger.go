@@ -3,7 +3,6 @@ package logger
 import (
 	"os"
 
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/config"
 	"github.com/labstack/gommon/log"
 	"github.com/sirupsen/logrus"
 )
@@ -16,12 +15,15 @@ type Logger interface {
 	Fatal(args ...interface{})
 }
 
-func NewLogger(conf *config.Config) Logger {
+func NewLogger(
+	logLevel log.Lvl,
+	logPath string,
+) Logger {
 	logger := logrus.New()
 
 	// установим уровень логирования
 	var level logrus.Level
-	switch conf.LogLevel {
+	switch logLevel {
 	case log.DEBUG:
 		level = logrus.DebugLevel
 	case log.INFO:
@@ -39,7 +41,7 @@ func NewLogger(conf *config.Config) Logger {
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
 	// установим вывод логов в файл
-	file, err := os.OpenFile(conf.LogPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
+	file, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
 	if err == nil {
 		logger.SetOutput(file)
 	} else {

@@ -17,6 +17,7 @@ type Config struct {
 	JwtSecretKey string  `env:"JWT_SECRET_KEY"`
 	LogLevel     log.Lvl `env:"LOG_LEVEL"`
 	LogPath      string  `env:"LOG_PATH"`
+	EnableHTTPS  bool    `env:"ENABLE_HTTPS"`
 }
 
 func NewConfig() (*Config, error) {
@@ -27,7 +28,7 @@ func NewConfig() (*Config, error) {
 	projectDirIndex := slices.Index(paths, "GophKeeper")
 	paths[0] = "/" + paths[0]
 	paths = paths[:projectDirIndex+1]
-	paths = append(paths, ".env")
+	paths = append(paths, "server.env")
 	envFilePath := path.Join(paths...)
 	if err := godotenv.Load(envFilePath); err != nil {
 		return nil, err
@@ -49,6 +50,9 @@ func NewConfig() (*Config, error) {
 	}
 	if flag.Lookup("f") == nil {
 		flag.StringVar(&config.LogPath, "f", "", "Log path")
+	}
+	if flag.Lookup("h") == nil {
+		flag.BoolVar(&config.EnableHTTPS, "h", false, "Use https")
 	}
 
 	flag.Parse()
@@ -76,6 +80,11 @@ func NewConfig() (*Config, error) {
 	logPath, exists := os.LookupEnv("LOG_PATH")
 	if exists {
 		config.LogPath = logPath
+	}
+
+	enableHTTPS, exists := os.LookupEnv("ENABLE_HTTPS")
+	if exists {
+		config.EnableHTTPS = enableHTTPS == "1"
 	}
 
 	switch strings.ToUpper(logLevel) {

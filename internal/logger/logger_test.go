@@ -3,8 +3,9 @@ package logger_test
 import (
 	"testing"
 
+	"github.com/ShukinDmitriy/GophKeeper/internal/logger"
+
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/config"
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/logger"
 	"github.com/labstack/gommon/log"
 )
 
@@ -59,7 +60,7 @@ func TestNewLogger(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			logger.NewLogger(tt.args.conf)
+			logger.NewLogger(tt.args.conf.LogLevel, "")
 		})
 	}
 }

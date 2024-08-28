@@ -6,7 +6,7 @@ import (
 	data "github.com/ShukinDmitriy/GophKeeper/internal/server/models/data"
 	mock "github.com/stretchr/testify/mock"
 
-	requests "github.com/ShukinDmitriy/GophKeeper/internal/server/models/requests"
+	requests "github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
 
 	responses "github.com/ShukinDmitriy/GophKeeper/internal/server/models/responses"
 )
