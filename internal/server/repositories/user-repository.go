@@ -13,18 +13,14 @@ import (
 	"gorm.io/gorm"
 )
 
-var userRepository *UserRepository
-
 type UserRepository struct {
 	db *gorm.DB
 }
 
 func NewUserRepository(db *gorm.DB) *UserRepository {
-	userRepository = &UserRepository{
+	return &UserRepository{
 		db: db,
 	}
-
-	return userRepository
 }
 
 func (r *UserRepository) Create(userRegister requests.UserRegister) (*responses.UserInfo, error) {

@@ -7,6 +7,8 @@ import (
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/auth"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/config"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/controllers"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -16,6 +18,7 @@ func NewHTTPServer(
 	conf *config.Config,
 	authService *auth.AuthService,
 	userController *controllers.UserController,
+	dataController *controllers.DataController,
 ) *echo.Echo {
 	e := echo.New()
 	e.Logger.SetLevel(conf.LogLevel)
@@ -69,26 +72,35 @@ func NewHTTPServer(
 		},
 	}))
 
-	//jwtMiddleware := echojwt.WithConfig(echojwt.Config{
-	//	BeforeFunc: authService.BeforeFunc,
-	//	NewClaimsFunc: func(_ echo.Context) jwt.Claims {
-	//		return &auth.Claims{}
-	//	},
-	//	SigningKey:    []byte(auth.GetJWTSecret()),
-	//	SigningMethod: jwt.SigningMethodHS256.Alg(),
-	//	TokenLookup:   "cookie:access-token", // "<source>:<name>"
-	//	ErrorHandler:  authService.JWTErrorChecker,
-	//})
+	jwtMiddleware := echojwt.WithConfig(echojwt.Config{
+		BeforeFunc: authService.BeforeFunc,
+		NewClaimsFunc: func(_ echo.Context) jwt.Claims {
+			return &auth.Claims{}
+		},
+		SigningKey:    []byte(auth.GetJWTSecret()),
+		SigningMethod: jwt.SigningMethodHS256.Alg(),
+		TokenLookup:   "cookie:access-token", // "<source>:<name>"
+		ErrorHandler:  authService.JWTErrorChecker,
+	})
 
 	// routes
 	// GET /swagger — swagger;
 	// POST /api/user/register — регистрация пользователя;
 	// POST /api/user/login — аутентификация пользователя;
+	// GET /api/data — список данных;
+	// POST /api/data — создать данные;
+	// GET /api/data/:id — получить данные;
+	// PUT /api/data/:id — изменить данные;
+	// DELETE /api/data/:id — удалить данные;
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	e.POST(router.ApiRegisterPath, userController.UserRegister())
 	e.POST(router.ApiLoginPath, userController.UserLogin())
-	// e.POST("/api/user/orders", orderController.CreateOrder(), jwtMiddleware)
+	e.GET(router.ApiDataListPath, dataController.DataIndex(), jwtMiddleware)
+	e.POST(router.ApiDataCreatePath, dataController.DataCreate(), jwtMiddleware)
+	e.GET(router.ApiDataReadPath, dataController.DataRead(), jwtMiddleware)
+	e.PUT(router.ApiDataUpdatePath, dataController.DataUpdate(), jwtMiddleware)
+	e.DELETE(router.ApiDataDeletePath, dataController.DataDelete(), jwtMiddleware)
 
 	return e
 }

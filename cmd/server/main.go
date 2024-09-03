@@ -81,9 +81,14 @@ func main() {
 
 				return db
 			},
-			// Репозиторий пользователя
+			// Репозитории:
+			// пользователя
 			func(DB *gorm.DB) *repositories.UserRepository {
 				return repositories.NewUserRepository(DB)
+			},
+			// данных
+			func(DB *gorm.DB) *repositories.DataRepository {
+				return repositories.NewDataRepository(DB)
 			},
 			// Аутентификация
 			func(userRepository *repositories.UserRepository) *auth.AuthUser {
@@ -93,7 +98,8 @@ func main() {
 			func(authUser *auth.AuthUser) *auth.AuthService {
 				return auth.NewAuthService(*authUser)
 			},
-			// Контроллер пользователя
+			// Контроллеры:
+			// пользователя
 			func(
 				authService *auth.AuthService,
 				userRepository *repositories.UserRepository,
@@ -103,6 +109,16 @@ func main() {
 					userRepository,
 				)
 			},
+			// данных
+			func(
+				authService *auth.AuthService,
+				dataRepository *repositories.DataRepository,
+			) *controllers.DataController {
+				return controllers.NewDataController(
+					authService,
+					dataRepository,
+				)
+			},
 			// http сервер
 			func(
 				lc fx.Lifecycle,
@@ -110,11 +126,13 @@ func main() {
 				appLog appLogger.Logger,
 				authService *auth.AuthService,
 				userController *controllers.UserController,
+				dataController *controllers.DataController,
 			) *echo.Echo {
 				httpServer := server.NewHTTPServer(
 					conf,
 					authService,
 					userController,
+					dataController,
 				)
 
 				lc.Append(fx.Hook{

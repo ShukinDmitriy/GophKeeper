@@ -1,5 +1,31 @@
 basePath: /api
 definitions:
+  models.DataType:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - DataTypeCredentials
+    - DataTypeText
+    - DataTypeBinary
+    - DataTypeBankCard
+  requests.DataModel:
+    properties:
+      description:
+        type: string
+      type:
+        $ref: '#/definitions/models.DataType'
+      user_id:
+        type: integer
+      value:
+        type: string
+    required:
+    - user_id
+    - value
+    type: object
   requests.UserLogin:
     properties:
       login:
@@ -28,6 +54,19 @@ definitions:
     - login
     - password
     type: object
+  responses.DataInfo:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      type:
+        $ref: '#/definitions/models.DataType'
+      value: {}
+    required:
+    - type
+    - value
+    type: object
   responses.UserInfo:
     properties:
       id:
@@ -42,6 +81,149 @@ info:
   title: Swagger EOL API
   version: "1.0"
 paths:
+  /data:
+    get:
+      consumes:
+      - application/json
+      description: Получение списка данных
+      parameters:
+      - enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        in: query
+        name: type
+        type: integer
+        x-enum-varnames:
+        - DataTypeCredentials
+        - DataTypeText
+        - DataTypeBinary
+        - DataTypeBankCard
+      - in: query
+        name: user_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/responses.DataInfo'
+              type: array
+            type: array
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+      tags:
+      - Data
+    post:
+      consumes:
+      - application/json
+      description: Создать данные
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DataModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/responses.DataInfo'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+      tags:
+      - Data
+  /data/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить данные
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+      tags:
+      - Data
+    get:
+      consumes:
+      - application/json
+      description: Получить данные
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.DataInfo'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+      tags:
+      - Data
+    put:
+      consumes:
+      - application/json
+      description: Обновить данные
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: number
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DataModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.DataInfo'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+      tags:
+      - Data
   /user/login:
     post:
       consumes:

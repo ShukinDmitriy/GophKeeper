@@ -1,9 +1,16 @@
 package server_test
 
 import (
+	"bytes"
 	"encoding/json"
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/router"
+	"github.com/stretchr/testify/assert"
+	"io"
 	"net/http"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -88,7 +95,7 @@ func userRegister(t *testing.T, conf *config.Config) {
 			resp, err := http.Post(
 				test_helpers.PrepareURL(conf, "/api/user/register"),
 				"application/json",
-				strings.NewReader(string(bodyJson)),
+				bytes.NewReader(bodyJson),
 			)
 			if err != nil {
 				t.Fatalf("Failed to send request: %v", err)
@@ -168,7 +175,7 @@ func userLogin(t *testing.T, conf *config.Config) {
 			resp, err := http.Post(
 				test_helpers.PrepareURL(conf, "/api/user/login"),
 				"application/json",
-				strings.NewReader(string(bodyJson)),
+				bytes.NewReader(bodyJson),
 			)
 			if err != nil {
 				t.Fatalf("Failed to send request: %v", err)
@@ -183,6 +190,254 @@ func userLogin(t *testing.T, conf *config.Config) {
 	}
 }
 
+func dataCRUD(t *testing.T, conf *config.Config) {
+	// Авторизация
+	body := map[string]string{
+		"login":    "login",
+		"password": "password",
+	}
+	bodyJson, _ := json.Marshal(body)
+	req, err := http.NewRequest("POST", test_helpers.PrepareURL(conf, router.ApiLoginPath), bytes.NewReader(bodyJson))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Сохранение cookie в переменную
+	var cookie *http.Cookie
+	for _, c := range resp.Cookies() {
+		if c.Name == "access-token" {
+			cookie = c
+			break
+		}
+	}
+
+	assert.NotNil(t, cookie)
+
+	t.Run("Get empty list data", func(t *testing.T) {
+		// Запрос для получения данных
+		req, err = http.NewRequest("GET", test_helpers.PrepareURL(conf, router.ApiDataListPath), nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		// Добавление cookie к запросу
+		req.AddCookie(cookie)
+
+		// Выполнение запроса получения данных
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Чтение ответа
+		resBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		var list []models.DataInfo
+		err = json.Unmarshal(resBody, &list)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		assert.Equal(t, len(list), 0)
+	})
+
+	var lastID uint
+
+	t.Run("Success create data", func(t *testing.T) {
+		// Запрос для создания данных
+		data := requests.DataModel{
+			Type:        models.DataTypeText,
+			Description: "test data",
+			Value:       "test value",
+		}
+		dataJson, _ := json.Marshal(data)
+		req, err = http.NewRequest("POST", test_helpers.PrepareURL(conf, router.ApiDataCreatePath), bytes.NewReader(dataJson))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		// Добавление cookie к запросу
+		req.AddCookie(cookie)
+
+		// Выполнение запроса получения данных
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Чтение ответа
+		resBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		var resData models.DataInfo
+		err = json.Unmarshal(resBody, &resData)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		assert.NotEqual(t, resData.ID, 0)
+		assert.Equal(t, resData.Type, data.Type)
+		assert.Equal(t, resData.Description, data.Description)
+		assert.Equal(t, resData.Value, data.Value)
+
+		lastID = resData.ID
+	})
+
+	t.Run("Success get data", func(t *testing.T) {
+		// Запрос для получения данных
+		url := test_helpers.PrepareURL(conf, router.ApiDataReadPath)
+		url = strings.Replace(url, ":id", strconv.Itoa(int(lastID)), 1)
+		req, err = http.NewRequest("GET", url, nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		// Добавление cookie к запросу
+		req.AddCookie(cookie)
+
+		// Выполнение запроса получения данных
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Чтение ответа
+		resBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		var reqData models.DataInfo
+		err = json.Unmarshal(resBody, &reqData)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		assert.Equal(t, reqData.ID, lastID)
+	})
+
+	t.Run("Getting non-existent data", func(t *testing.T) {
+		// Запрос для получения данных
+		url := test_helpers.PrepareURL(conf, router.ApiDataReadPath)
+		url = strings.Replace(url, ":id", strconv.Itoa(int(lastID+1)), 1)
+		req, err = http.NewRequest("GET", url, nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		// Добавление cookie к запросу
+		req.AddCookie(cookie)
+
+		// Выполнение запроса получения данных
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+
+		assert.Equal(t, resp.StatusCode, http.StatusNotFound)
+	})
+
+	t.Run("Success update data", func(t *testing.T) {
+		// Запрос для создания данных
+		data := requests.DataModel{
+			Type:        models.DataTypeText,
+			Description: "test data updated",
+			Value:       "test value updated",
+		}
+		dataJson, _ := json.Marshal(data)
+		url := test_helpers.PrepareURL(conf, router.ApiDataUpdatePath)
+		url = strings.Replace(url, ":id", strconv.Itoa(int(lastID)), 1)
+		req, err = http.NewRequest("PUT", url, bytes.NewReader(dataJson))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		// Добавление cookie к запросу
+		req.AddCookie(cookie)
+
+		// Выполнение запроса получения данных
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Чтение ответа
+		resBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		var resData models.DataInfo
+		err = json.Unmarshal(resBody, &resData)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		assert.Equal(t, resData.ID, lastID)
+		assert.Equal(t, resData.Type, data.Type)
+		assert.Equal(t, resData.Description, data.Description)
+		assert.Equal(t, resData.Value, data.Value)
+	})
+
+	t.Run("Success delete data", func(t *testing.T) {
+		// Запрос для создания данных
+		url := test_helpers.PrepareURL(conf, router.ApiDataUpdatePath)
+		url = strings.Replace(url, ":id", strconv.Itoa(int(lastID)), 1)
+		req, err = http.NewRequest("DELETE", url, nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		// Добавление cookie к запросу
+		req.AddCookie(cookie)
+
+		// Выполнение запроса получения данных
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+
+		assert.Equal(t, resp.StatusCode, http.StatusAccepted)
+	})
+}
+
 func TestServer(t *testing.T) {
 	// Запуск сервера
 	_, conf, httpServer := test_helpers.RunServer(t)
@@ -190,6 +445,7 @@ func TestServer(t *testing.T) {
 	// Запуск тестов сервера
 	userRegister(t, conf)
 	userLogin(t, conf)
+	dataCRUD(t, conf)
 
 	// Отключаем сервер
 	test_helpers.StopServer(t, httpServer)

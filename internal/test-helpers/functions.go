@@ -38,17 +38,23 @@ func createServer(t *testing.T, conf *config.Config) *echo.Echo {
 		t.Fatal(err)
 	}
 	userRepository := repositories.NewUserRepository(db)
+	dataRepository := repositories.NewDataRepository(db)
 	authUser := auth.NewAuthUser(userRepository)
 	authService := auth.NewAuthService(*authUser)
 	userController := controllers.NewUserController(
 		authService,
 		userRepository,
 	)
+	dataController := controllers.NewDataController(
+		authService,
+		dataRepository,
+	)
 
 	httpServer := server.NewHTTPServer(
 		conf,
 		authService,
 		userController,
+		dataController,
 	)
 
 	go func() {
