@@ -173,6 +173,7 @@ func (authService *AuthService) setTokenCookie(c echo.Context, name, token strin
 	cookie.HttpOnly = true
 
 	c.SetCookie(cookie)
+	c.Request().AddCookie(cookie)
 }
 
 func (authService *AuthService) setUserCookie(c echo.Context, user *responses.UserInfo, expiration time.Time) {

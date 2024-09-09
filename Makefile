@@ -20,9 +20,9 @@ server:
 	docker compose -f server.docker-compose.yml start
 
 test:
-	docker compose -f test.docker-compose.yml start
+	docker compose -f test.docker-compose.yml up -d
 	docker compose -f test.docker-compose.yml logs -f golang
-	docker compose -f test.docker-compose.yml stop
+	docker compose -f test.docker-compose.yml down
 
 test-cover:
 	go test -v -coverprofile=coverage.out ./... && go tool cover -html=coverage.out -o coverage.html

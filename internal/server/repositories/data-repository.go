@@ -28,10 +28,11 @@ func (r *DataRepository) List(request requests.DataList) ([]*models.DataInfo, er
 		   datas.type        as type,
 		   datas.value       as value,
 		   datas.description as description`).
-		Where("datas.deleted_at IS NULL")
+		Where("datas.deleted_at IS NULL").
+		Order("id ASC")
 
 	if request.Type != 0 {
-		query = query.Where("datas.value=?", request.Type)
+		query = query.Where("datas.type=?", request.Type)
 	}
 
 	if request.UserID != 0 {

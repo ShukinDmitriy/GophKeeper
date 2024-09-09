@@ -8,5 +8,5 @@ go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@lat
 /usr/bin/make -f Makefile migrate-up
 
 printf "Run tests...\n\n"
-cd /app \
-&& make test-cover
+cd /GophKeeper
+/usr/bin/make test-cover

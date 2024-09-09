@@ -6,5 +6,6 @@ github.com/ShukinDmitriy/GophKeeper/mocks/internal_/client/http/ClientInterface.
 github.com/ShukinDmitriy/GophKeeper/mocks/internal_/logger/Logger.go
 github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/auth/AuthServiceInterface.go
 github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/logger/Logger.go
+github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/repositories/DataRepositoryInterface.go
 github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/repositories/UserRepositoryInterface.go
 github.com/ShukinDmitriy/GophKeeper/test_spec.go

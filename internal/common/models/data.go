@@ -3,7 +3,8 @@ package models
 type DataType int
 
 const (
-	DataTypeCredentials DataType = iota
+	DataTypeUnknown DataType = iota
+	DataTypeCredentials
 	DataTypeText
 	DataTypeBinary
 	DataTypeBankCard

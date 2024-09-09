@@ -1,7 +1,7 @@
 FROM golang:1.22
 
-WORKDIR /app
+WORKDIR /GophKeeper
 
 RUN go install golang.org/x/tools/cmd/goimports@latest
 
-ENTRYPOINT ["/app/docker/autotests/docker-entrypoint.sh"]
+ENTRYPOINT ["/GophKeeper/docker/autotests/docker-entrypoint.sh"]

@@ -3,6 +3,7 @@ package client_test
 import (
 	"context"
 	"fmt"
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 	"testing"
 	"time"
 
@@ -113,7 +114,7 @@ func goToRegisterAndReturnToLoginPage(
 		for {
 			select {
 			case <-timeout:
-				t.Fatal("timed out waiting for route to register")
+				t.Fatal("timed out waiting")
 			default:
 				currentPage := tuiService.GetCurrentPage()
 				if currentPage != "" {
@@ -133,7 +134,7 @@ func goToRegisterAndReturnToLoginPage(
 		for {
 			select {
 			case <-timeout:
-				t.Fatal("timed out waiting for route to register")
+				t.Fatal("timed out waiting")
 			default:
 				currentPage := tuiService.GetCurrentPage()
 				if currentPage == router.RegisterPage {
@@ -152,7 +153,7 @@ func goToRegisterAndReturnToLoginPage(
 		for {
 			select {
 			case <-timeout:
-				t.Fatal("timed out waiting for route to register")
+				t.Fatal("timed out waiting")
 			default:
 				currentPage := tuiService.GetCurrentPage()
 				if currentPage == router.LoginPage {
@@ -185,7 +186,7 @@ func submitLoginForm(
 		for {
 			select {
 			case <-timeout:
-				t.Fatal("timed out waiting for route to register")
+				t.Fatal("timed out waiting")
 			default:
 				currentPage := tuiService.GetCurrentPage()
 				if currentPage == router.ErrorPage {
@@ -197,7 +198,7 @@ func submitLoginForm(
 	})
 
 	t.Run("test submit valid login form", func(t *testing.T) {
-		// timeout := time.After(30 * time.Second)
+		timeout := time.After(30 * time.Second)
 
 	_:
 		eventBus.Next(&event.Event{
@@ -209,20 +210,19 @@ func submitLoginForm(
 		})
 
 		time.Sleep(2 * time.Second)
-		// TODO проверить, что страница стала правильной
-		// GetErrorPage:
-		//	for {
-		//		select {
-		//		case <-timeout:
-		//			t.Fatal("timed out waiting for route to register")
-		//		default:
-		//			currentPage := tuiService.GetCurrentPage()
-		//			if currentPage == router.ErrorPage {
-		//				break GetErrorPage
-		//			}
-		//			time.Sleep(1 * time.Second)
-		//		}
-		//	}
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
 	})
 }
 
@@ -247,7 +247,7 @@ func submitRegisterForm(
 		for {
 			select {
 			case <-timeout:
-				t.Fatal("timed out waiting for route to register")
+				t.Fatal("timed out waiting")
 			default:
 				currentPage := tuiService.GetCurrentPage()
 				if currentPage == router.ErrorPage {
@@ -259,8 +259,7 @@ func submitRegisterForm(
 	})
 
 	t.Run("test submit valid register form", func(t *testing.T) {
-		// timeout := time.After(30 * time.Second)
-		fmt.Println("test")
+		timeout := time.After(30 * time.Second)
 	_:
 		eventBus.Next(&event.Event{
 			Name: event.ClientEventPressRegisterButton,
@@ -271,28 +270,418 @@ func submitRegisterForm(
 		})
 
 		time.Sleep(2 * time.Second)
-		// TODO проверить, что страница стала правильной
-		// GetErrorPage:
-		//	for {
-		//		select {
-		//		case <-timeout:
-		//			t.Fatal("timed out waiting for route to register")
-		//		default:
-		//			currentPage := tuiService.GetCurrentPage()
-		//			if currentPage == router.ErrorPage {
-		//				break GetErrorPage
-		//			}
-		//			time.Sleep(1 * time.Second)
-		//		}
-		//	}
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
 	})
+}
+
+func selectDataRow(
+	t *testing.T,
+	eventBus *event.Observable,
+	tuiService *tui.TUIService,
+) {
+	t.Run("test select credentials data row", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectDataRow,
+			Data: models.DataInfo{
+				ID:          777,
+				Type:        models.DataTypeCredentials,
+				Description: "test",
+				Value:       "ewogICJMb2dpbiI6ICJ0ZXN0IiwKICAiUGFzc3dvcmQiOiAidGVzdCIKfQ==",
+			},
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test select text data row", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectDataRow,
+			Data: models.DataInfo{
+				ID:          777,
+				Type:        models.DataTypeText,
+				Description: "test",
+				Value:       "ewogICJUZXh0IjogInRlc3QiCn0=",
+			},
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test select binary data row", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectDataRow,
+			Data: models.DataInfo{
+				ID:          777,
+				Type:        models.DataTypeBinary,
+				Description: "test",
+				Value:       "ewogICJCaW5hcnkiOiAidGVzdCIKfQ==",
+			},
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test select bank data row", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectDataRow,
+			Data: models.DataInfo{
+				ID:          777,
+				Type:        models.DataTypeBankCard,
+				Description: "test",
+				Value:       "ewogICJOdW1iZXIiOiAiMjIwMDEyMzQ0MzIxOTg3NiIsCiAgIkRhdGUiOiAiMDIvMjUiLAogICJTZWN1cmUiOiAiMTIzIgp9",
+			},
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+}
+
+func clickCreateButton(
+	t *testing.T,
+	eventBus *event.Observable,
+	tuiService *tui.TUIService,
+) {
+	t.Run("test click create button", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventPressToCreateFormButton,
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test select credentials create form", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectCreateDataType,
+			Data: "Учетные данные",
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test select text create form", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectCreateDataType,
+			Data: "Текстовые данные",
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test select binary create form", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectCreateDataType,
+			Data: "Бинарные данные",
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test select bank create form", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventSelectCreateDataType,
+			Data: "Данные банковских карт",
+		})
+
+	GetDataPage:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				currentPage := tuiService.GetCurrentPage()
+				if currentPage == router.DataPage {
+					break GetDataPage
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+}
+
+func crudData(
+	t *testing.T,
+	eventBus *event.Observable,
+	tuiService *tui.TUIService,
+) {
+	var dataInfo models.DataInfo
+
+	// Подписываемся на событие, чтобы отловить созданную запись
+	subscription := eventBus.Subscribe(func(e *event.Event) {
+		if e.Name != event.ClientEventCreatedData {
+			return
+		}
+
+		eventDataInfo, ok := e.Data.(models.DataInfo)
+		if ok {
+			dataInfo = eventDataInfo
+		}
+	})
+
+	t.Run("test create data", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		dataCreated := false
+		// Подписка, чтобы отследить успешное выполнение
+		subscription := eventBus.Subscribe(func(e *event.Event) {
+			if e.Name != event.ClientEventCreatedData {
+				return
+			}
+
+			dataCreated = true
+		})
+
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventCreateData,
+			Data: requests.DataModel{
+				Type:        models.DataTypeCredentials,
+				Description: "test",
+				Value:       "ewogICJMb2dpbiI6ICJ0ZXN0IiwKICAiUGFzc3dvcmQiOiAidGVzdCIKfQ==",
+			},
+		})
+
+	AwaitDataCreated:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				if dataCreated {
+					subscription.Unsubscribe()
+					break AwaitDataCreated
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test update data", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		dataUpdated := false
+		// Подписка, чтобы отследить успешное выполнение
+		subscription := eventBus.Subscribe(func(e *event.Event) {
+			if e.Name != event.ClientEventUpdatedData {
+				return
+			}
+
+			dataUpdated = true
+		})
+
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventUpdateData,
+			Data: models.DataInfo{
+				ID:          dataInfo.ID,
+				Type:        dataInfo.Type,
+				Description: "test updated",
+				Value:       "ewogICJMb2dpbiI6ICJ0ZXN0IHVwZGF0ZWQiLAogICJQYXNzd29yZCI6ICJ0ZXN0IHVwZGF0ZWQiCn0=",
+			},
+		})
+
+	AwaitDataUpdated:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				if dataUpdated {
+					subscription.Unsubscribe()
+					break AwaitDataUpdated
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	t.Run("test delete data", func(t *testing.T) {
+		timeout := time.After(30 * time.Second)
+
+	_:
+		dataDeleted := false
+		// Подписка, чтобы отследить успешное выполнение
+		subscription := eventBus.Subscribe(func(e *event.Event) {
+			if e.Name != event.ClientEventDeletedData {
+				return
+			}
+
+			dataDeleted = true
+		})
+
+		eventBus.Next(&event.Event{
+			Name: event.ClientEventDeleteData,
+			Data: models.DataInfo{
+				ID:          dataInfo.ID,
+				Type:        dataInfo.Type,
+				Description: "test updated",
+				Value:       "ewogICJMb2dpbiI6ICJ0ZXN0IHVwZGF0ZWQiLAogICJQYXNzd29yZCI6ICJ0ZXN0IHVwZGF0ZWQiCn0=",
+			},
+		})
+
+	AwaitDataDeleted:
+		for {
+			select {
+			case <-timeout:
+				t.Fatal("timed out waiting")
+			default:
+				if dataDeleted {
+					subscription.Unsubscribe()
+					break AwaitDataDeleted
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	})
+
+	subscription.Unsubscribe()
 }
 
 func TestClient(t *testing.T) {
 	// Запуск сервера
-	_, _, httpServer := test_helpers.RunServer(t)
+	_, serverConf, httpServer := test_helpers.RunServer(t)
 
 	conf := createConfig(t)
+	if serverConf.EnableHTTPS {
+		conf.ServerAddress = fmt.Sprintf("https://%s", serverConf.RunAddress)
+	} else {
+		conf.ServerAddress = fmt.Sprintf("http://%s", serverConf.RunAddress)
+	}
+
 	appLog := createLogger(conf)
 	httpClient := createHttpClient(t, conf, appLog)
 	eventBus := createEventBus()
@@ -316,6 +705,9 @@ func TestClient(t *testing.T) {
 	goToRegisterAndReturnToLoginPage(t, eventBus, tuiService)
 	submitLoginForm(t, eventBus, tuiService)
 	submitRegisterForm(t, eventBus, tuiService)
+	selectDataRow(t, eventBus, tuiService)
+	clickCreateButton(t, eventBus, tuiService)
+	crudData(t, eventBus, tuiService)
 
 	// Отработали, останавливаем приложение
 	err := tClient.Shutdown(ctx)

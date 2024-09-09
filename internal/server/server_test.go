@@ -190,6 +190,66 @@ func userLogin(t *testing.T, conf *config.Config) {
 	}
 }
 
+func userRefresh(t *testing.T, conf *config.Config) {
+	// Авторизация
+	body := map[string]string{
+		"login":    "login",
+		"password": "password",
+	}
+	bodyJson, _ := json.Marshal(body)
+	req, err := http.NewRequest("POST", test_helpers.PrepareURL(conf, router.ApiLoginPath), bytes.NewReader(bodyJson))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Сохранение cookie в переменную
+	var cookie *http.Cookie
+	for _, c := range resp.Cookies() {
+		if c.Name == "refresh-token" {
+			cookie = c
+			break
+		}
+	}
+
+	assert.NotNil(t, cookie)
+
+	t.Run("Get list data with only refresh token", func(t *testing.T) {
+		// Запрос для получения данных
+		req, err = http.NewRequest("GET", test_helpers.PrepareURL(conf, router.ApiDataListPath), nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+		// Добавление cookie к запросу
+		req.AddCookie(cookie)
+
+		// Выполнение запроса получения данных
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Проверяем статус ответа
+		successStatuses := []int{http.StatusOK, http.StatusNoContent}
+		if !slices.Contains(successStatuses, resp.StatusCode) {
+			t.Errorf("Expected status code %d, got %d", successStatuses, resp.StatusCode)
+		}
+	})
+}
+
 func dataCRUD(t *testing.T, conf *config.Config) {
 	// Авторизация
 	body := map[string]string{
@@ -255,7 +315,7 @@ func dataCRUD(t *testing.T, conf *config.Config) {
 			return
 		}
 
-		assert.Equal(t, len(list), 0)
+		assert.Equal(t, 0, len(list))
 	})
 
 	var lastID uint
@@ -445,6 +505,7 @@ func TestServer(t *testing.T) {
 	// Запуск тестов сервера
 	userRegister(t, conf)
 	userLogin(t, conf)
+	userRefresh(t, conf)
 	dataCRUD(t, conf)
 
 	// Отключаем сервер

@@ -34,7 +34,7 @@ func NewDataController(
 // @Accept json
 // @Produce json
 // @Param data query requests.DataList true "data"
-// @Success 200 {array} []responses.DataInfo
+// @Success 200 {array} []models.DataInfo
 // @Failure 400 "BadRequest"
 // @Failure 401 "Unauthorized"
 // @Failure 500 "Internal server error"
@@ -73,7 +73,7 @@ func (controller *DataController) DataIndex() echo.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param data body requests.DataModel true "data"
-// @Success 201 {object} responses.DataInfo
+// @Success 201 {object} models.DataInfo
 // @Failure 400 "BadRequest"
 // @Failure 401 "Unauthorized"
 // @Failure 500 "Internal server error"
@@ -112,7 +112,7 @@ func (controller *DataController) DataCreate() echo.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path number true "id"
-// @Success 200 {object} responses.DataInfo
+// @Success 200 {object} models.DataInfo
 // @Failure 400 "BadRequest"
 // @Failure 401 "Unauthorized"
 // @Failure 500 "Internal server error"
@@ -149,7 +149,8 @@ func (controller *DataController) DataRead() echo.HandlerFunc {
 // @Produce json
 // @Param id path number true "id"
 // @Param data body commonRequests.DataModel true "data"
-// @Success 200 {object} responses.DataInfo
+// @Success 200 {object} models.DataInfo
+// @Failure 400 "BadRequest"
 // @Failure 401 "Unauthorized"
 // @Failure 500 "Internal server error"
 // @Router /data/{id} [put]

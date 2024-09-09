@@ -33,10 +33,12 @@ const docTemplate = `{
                             0,
                             1,
                             2,
-                            3
+                            3,
+                            4
                         ],
                         "type": "integer",
                         "x-enum-varnames": [
+                            "DataTypeUnknown",
                             "DataTypeCredentials",
                             "DataTypeText",
                             "DataTypeBinary",
@@ -59,7 +61,7 @@ const docTemplate = `{
                             "items": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "#/definitions/responses.DataInfo"
+                                    "$ref": "#/definitions/models.DataInfo"
                                 }
                             }
                         }
@@ -101,7 +103,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/responses.DataInfo"
+                            "$ref": "#/definitions/models.DataInfo"
                         }
                     },
                     "400": {
@@ -141,7 +143,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.DataInfo"
+                            "$ref": "#/definitions/models.DataInfo"
                         }
                     },
                     "400": {
@@ -188,8 +190,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.DataInfo"
+                            "$ref": "#/definitions/models.DataInfo"
                         }
+                    },
+                    "400": {
+                        "description": "BadRequest"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -318,15 +323,38 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.DataInfo": {
+            "type": "object",
+            "required": [
+                "type",
+                "value"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/models.DataType"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "models.DataType": {
             "type": "integer",
             "enum": [
                 0,
                 1,
                 2,
-                3
+                3,
+                4
             ],
             "x-enum-varnames": [
+                "DataTypeUnknown",
                 "DataTypeCredentials",
                 "DataTypeText",
                 "DataTypeBinary",
@@ -390,25 +418,6 @@ const docTemplate = `{
                     "maxLength": 32,
                     "minLength": 4
                 }
-            }
-        },
-        "responses.DataInfo": {
-            "type": "object",
-            "required": [
-                "type",
-                "value"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "type": {
-                    "$ref": "#/definitions/models.DataType"
-                },
-                "value": {}
             }
         },
         "responses.UserInfo": {

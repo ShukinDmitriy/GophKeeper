@@ -20,7 +20,7 @@ services:
     build:
       context: docker/autotests
     volumes:
-      - .:/app
+      - .:/GophKeeper
     depends_on:
       - postgres
     networks:

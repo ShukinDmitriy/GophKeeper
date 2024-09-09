@@ -1,15 +1,14 @@
 package auth_test
 
 import (
+	"github.com/ShukinDmitriy/GophKeeper/internal/server/config"
+	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/responses"
+	mockRepositories "github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/repositories"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strings"
 	"testing"
-
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/config"
-	"github.com/ShukinDmitriy/GophKeeper/internal/server/models/responses"
-	mockRepositories "github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/repositories"
 
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/auth"
 	"github.com/golang-jwt/jwt/v5"
