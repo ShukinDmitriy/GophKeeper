@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+
 	"github.com/ShukinDmitriy/GophKeeper/internal/client/event"
 	"github.com/ShukinDmitriy/GophKeeper/internal/client/router"
 	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"

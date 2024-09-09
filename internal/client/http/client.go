@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 
 	commonRequests "github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
 	"github.com/ShukinDmitriy/GophKeeper/internal/common/router"

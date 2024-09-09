@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"errors"
+	"net/http"
+	"strconv"
+
 	commonRequests "github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
 	"github.com/ShukinDmitriy/GophKeeper/internal/helpers"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/auth"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/repositories"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"net/http"
-	"strconv"
 )
 
 type DataController struct {

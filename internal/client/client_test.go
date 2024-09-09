@@ -3,9 +3,10 @@ package client_test
 import (
 	"context"
 	"fmt"
-	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 	"testing"
 	"time"
+
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 
 	"github.com/ShukinDmitriy/GophKeeper/internal/client"
 	"github.com/ShukinDmitriy/GophKeeper/internal/client/config"

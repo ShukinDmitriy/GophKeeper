@@ -3,16 +3,17 @@ package server_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
-	"github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
-	"github.com/ShukinDmitriy/GophKeeper/internal/common/router"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"slices"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
+	"github.com/ShukinDmitriy/GophKeeper/internal/common/router"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/ShukinDmitriy/GophKeeper/internal/test-helpers"
 

@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+
 	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 	commonRequests "github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
 )

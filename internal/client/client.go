@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+
 	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 
 	commonRequests "github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
@@ -204,7 +205,7 @@ func (c *Client) Run(ctx context.Context) error {
 	})
 
 	c.tuiService.LoginPage()
-	//c.tuiService.DataPage()
+	// c.tuiService.DataPage()
 
 	// Должен работать в основном потоке...
 	err := c.tuiService.Run()

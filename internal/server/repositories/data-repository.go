@@ -1,11 +1,12 @@
 package repositories
 
 import (
+	"time"
+
 	"github.com/ShukinDmitriy/GophKeeper/internal/common/models"
 	"github.com/ShukinDmitriy/GophKeeper/internal/common/models/requests"
 	"github.com/ShukinDmitriy/GophKeeper/internal/server/entities"
 	"gorm.io/gorm/clause"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -59,7 +60,6 @@ func (r *DataRepository) Create(dataCreate requests.DataModel) (*models.DataInfo
 			DoUpdates: clause.AssignmentColumns([]string{"deleted_at", "value", "description"}),
 		}).
 		Create(data).Error
-
 	if err != nil {
 		return nil, err
 	}
