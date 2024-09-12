@@ -39,3 +39,9 @@ format:
 
 generate-swagger:
 	~/go/bin/swag init -g ./cmd/server/main.go -o ./cmd/server/docs
+
+build:
+	cd ./cmd/server && GOOS=linux GOARCH=amd64 go build -o server-linux-amd64
+	cd ./cmd/server && GOOS=windows GOARCH=amd64 go build -o server-windows-amd64
+	cd ./cmd/client && GOOS=linux GOARCH=amd64 go build -o client-linux-amd64
+	cd ./cmd/client && GOOS=windows GOARCH=amd64 go build -o client-windows-amd64
