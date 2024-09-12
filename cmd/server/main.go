@@ -83,42 +83,18 @@ func main() {
 			},
 			// Репозитории:
 			// пользователя
-			func(DB *gorm.DB) *repositories.UserRepository {
-				return repositories.NewUserRepository(DB)
-			},
+			repositories.NewUserRepository,
 			// данных
-			func(DB *gorm.DB) *repositories.DataRepository {
-				return repositories.NewDataRepository(DB)
-			},
+			repositories.NewDataRepository,
 			// Аутентификация
-			func(userRepository *repositories.UserRepository) *auth.AuthUser {
-				return auth.NewAuthUser(userRepository)
-			},
+			auth.NewAuthUser,
 			// Сервис работы с аутентификацией
-			func(authUser *auth.AuthUser) *auth.AuthService {
-				return auth.NewAuthService(*authUser)
-			},
+			auth.NewAuthService,
 			// Контроллеры:
 			// пользователя
-			func(
-				authService *auth.AuthService,
-				userRepository *repositories.UserRepository,
-			) *controllers.UserController {
-				return controllers.NewUserController(
-					authService,
-					userRepository,
-				)
-			},
+			controllers.NewUserController,
 			// данных
-			func(
-				authService *auth.AuthService,
-				dataRepository *repositories.DataRepository,
-			) *controllers.DataController {
-				return controllers.NewDataController(
-					authService,
-					dataRepository,
-				)
-			},
+			controllers.NewDataController,
 			// http сервер
 			func(
 				lc fx.Lifecycle,
