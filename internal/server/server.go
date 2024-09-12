@@ -64,11 +64,7 @@ func NewHTTPServer(
 	// decompress
 	e.Use(middleware.DecompressWithConfig(middleware.DecompressConfig{
 		Skipper: func(c echo.Context) bool {
-			if strings.Contains(c.Request().URL.Path, "swagger") {
-				return true
-			}
-
-			return false
+      return strings.Contains(c.Request().URL.Path, "swagger")
 		},
 	}))
 
