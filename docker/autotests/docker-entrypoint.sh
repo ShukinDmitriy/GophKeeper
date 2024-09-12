@@ -9,4 +9,4 @@ go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@lat
 
 printf "Run tests...\n\n"
 cd /GophKeeper
-/usr/bin/make test-cover
+/usr/bin/make test-cover-cli
