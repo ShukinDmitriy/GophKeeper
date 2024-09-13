@@ -1,0 +1,11 @@
+github.com/ShukinDmitriy/GophKeeper/cmd/client/main.go
+github.com/ShukinDmitriy/GophKeeper/cmd/server/main.go
+github.com/ShukinDmitriy/GophKeeper/cmd/server/docs/docs.go
+github.com/ShukinDmitriy/GophKeeper/internal/test-helpers/functions.go
+github.com/ShukinDmitriy/GophKeeper/mocks/internal_/client/http/ClientInterface.go
+github.com/ShukinDmitriy/GophKeeper/mocks/internal_/logger/Logger.go
+github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/auth/AuthServiceInterface.go
+github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/logger/Logger.go
+github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/repositories/DataRepositoryInterface.go
+github.com/ShukinDmitriy/GophKeeper/mocks/internal_/server/repositories/UserRepositoryInterface.go
+github.com/ShukinDmitriy/GophKeeper/test_spec.go

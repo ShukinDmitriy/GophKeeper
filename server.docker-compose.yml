@@ -1,0 +1,35 @@
+services:
+# БД postgres
+  postgres:
+    container_name: postgres
+    image: postgres:16.4
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: praktikum
+    expose:
+      - "5432"
+    networks:
+      server:
+        ipv4_address: 192.168.60.12
+
+# go
+  golang:
+    container_name: golang
+    build:
+      context: docker/server
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    networks:
+      server:
+        ipv4_address: 192.168.60.10
+
+networks:
+  server:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.60.0/24

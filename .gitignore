@@ -22,4 +22,10 @@ go.work
 go.work.sum
 
 # env file
-.env
+*.env
+
+# test coverage
+coverage.html
+
+# logs
+logs/*
